@@ -31,14 +31,14 @@ const Main = () => {
           <div className="pt-12">
             <ul className="flex md:flex-col justify-center gap-12 md:gap-5  text-lg font-semibold">
               <li>
-                <NavLink to="/" className="flex gap-2 items-center pl-8 py-2">
+                <NavLink to="/" className="flex gap-2 items-center px-8 py-2">
                   <BsBox className="inline"></BsBox>Products
                 </NavLink>
               </li>
               <li>
                 <NavLink
                   to="/add-products"
-                  className="flex gap-2 items-center pl-8 py-2"
+                  className="flex gap-2 items-center px-8 py-2"
                 >
                   <BsBagPlus></BsBagPlus>Add Products
                 </NavLink>
@@ -46,7 +46,7 @@ const Main = () => {
               <li>
                 <NavLink
                   to="/bin"
-                  className="flex gap-2 items-center pl-8 py-2"
+                  className="flex gap-2 items-center px-8 py-2"
                 >
                   <BsTrash3 /> Trash
                 </NavLink>
