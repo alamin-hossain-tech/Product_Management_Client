@@ -26,3 +26,8 @@ ul li .active::before {
 .selected {
   background: var(--lightBlue);
 }
+
+.detail_product img {
+  width: 300px;
+  padding: 1.5rem;
+}

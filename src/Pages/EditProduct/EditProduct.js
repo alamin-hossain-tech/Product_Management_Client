@@ -10,68 +10,93 @@ import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast, Toaster } from "react-hot-toast";
 import { BsHouseDoor } from "react-icons/bs";
-import { Link } from "react-router-dom";
+import { Link, useLoaderData, useNavigate } from "react-router-dom";
 
-const AddProducts = () => {
+const EditProduct = () => {
+  const product = useLoaderData();
+  const id = product._id;
+  const router = useNavigate();
   const imghostkey = "d97d482501a67311603442b3ef683399";
   const [loading, setLoading] = useState(false);
 
-  const { register, handleSubmit, reset } = useForm();
+  const { register, handleSubmit } = useForm();
 
-  const handleAddProduct = (data) => {
+  const handleEditProduct = (data) => {
     setLoading(true);
-    console.log(data);
     const image = data.productImage[0];
     const formData = new FormData();
     formData.append("image", image);
     const url = `https://api.imgbb.com/1/upload?key=${imghostkey}`;
-    fetch(url, {
-      method: "POST",
-      body: formData,
-    })
-      .then((res) => res.json())
-      .then((imageData) => {
-        if (imageData.success) {
-          const product = {
-            name: data.productName,
-            img: imageData.data.url,
-            category: data.productCategory,
-            seller: data.productSeller,
-            price: data.productPrice,
-            stock: data.productStock,
-            ratings: data.productRating,
-          };
-          fetch("http://localhost:5000/add-product", {
-            method: "POST",
-            headers: { "content-type": "application/json" },
-            body: JSON.stringify(product),
-          })
-            .then((res) => res.json())
-            .then((result) => {
-              toast.success("Product Added Successfully");
-              reset();
-              setLoading(false);
-            });
-        } else {
-          toast.error("Provide a Valid image file");
+    if (image) {
+      fetch(url, {
+        method: "POST",
+        body: formData,
+      })
+        .then((res) => res.json())
+        .then((imageData) => {
+          if (imageData.success) {
+            const product = {
+              name: data.productName,
+              img: imageData.data.url,
+              category: data.productCategory,
+              seller: data.productSeller,
+              price: data.productPrice,
+              stock: data.productStock,
+              ratings: data.productRating,
+            };
+            fetch(`http://localhost:5000/edit/${id}`, {
+              method: "PUT",
+              headers: { "content-type": "application/json" },
+              body: JSON.stringify(product),
+            })
+              .then((res) => res.json())
+              .then((result) => {
+                toast.success("Product Updated Successfully");
+                setLoading(false);
+                setTimeout(() => router("/"), 1500);
+              });
+          } else {
+            toast.error("Provide a Valid image file");
+            setLoading(false);
+          }
+        });
+    } else {
+      const product = {
+        name: data.productName,
+        category: data.productCategory,
+        seller: data.productSeller,
+        price: data.productPrice,
+        stock: data.productStock,
+        ratings: data.productRating,
+      };
+      fetch(`http://localhost:5000/edit/${id}`, {
+        method: "PUT",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify(product),
+      })
+        .then((res) => res.json())
+        .then((result) => {
+          toast.success("Product Updated Successfully");
           setLoading(false);
-        }
-      });
+          setTimeout(() => router("/"), 1500);
+        });
+    }
   };
-
   return (
     <div className="bg-gray-200 h-[91.4vh]">
       <div className="px-6 container mx-auto pt-5">
-        <h2 className="text-4xl font-semibold pb-2">Add Product</h2>
+        <h2 className="text-4xl font-semibold pb-2">Editing {product.name}</h2>
         <Breadcrumb aria-label="Default breadcrumb example">
           <Breadcrumb.Item icon={() => <BsHouseDoor className="mr-1" />}>
             <Link to="/">Home</Link>
           </Breadcrumb.Item>
-          <Breadcrumb.Item>Add Products</Breadcrumb.Item>
+          <Breadcrumb.Item>Edit</Breadcrumb.Item>
         </Breadcrumb>
         <div className="pt-5">
+          {" "}
+          <img src={product.img} className="w-48 shadow my-3 rounded" alt="" />
           <form
-            onSubmit={handleSubmit(handleAddProduct)}
+            onSubmit={handleSubmit(handleEditProduct)}
             className="flex flex-col gap-4"
           >
             <div className="flex gap-2">
@@ -84,6 +109,7 @@ const AddProducts = () => {
                   type="text"
                   placeholder="Product Name"
                   required={true}
+                  defaultValue={product.name}
                   {...register("productName")}
                 />
               </div>
@@ -97,6 +123,7 @@ const AddProducts = () => {
                   placeholder="Category"
                   required={true}
                   {...register("productCategory")}
+                  defaultValue={product.category}
                 />
               </div>
             </div>
@@ -111,6 +138,7 @@ const AddProducts = () => {
                   placeholder="Seller"
                   required={true}
                   {...register("productSeller")}
+                  defaultValue={product.seller}
                 />
               </div>
               <div className="flex-1">
@@ -123,6 +151,7 @@ const AddProducts = () => {
                   placeholder="Price"
                   required={true}
                   {...register("productPrice")}
+                  defaultValue={product.price}
                 />
               </div>
               <div className="flex-1">
@@ -136,6 +165,7 @@ const AddProducts = () => {
                   required={true}
                   step={0.1}
                   {...register("productRating")}
+                  defaultValue={product.ratings}
                 />
               </div>
               <div className="flex-1">
@@ -148,6 +178,7 @@ const AddProducts = () => {
                   placeholder="Stock"
                   required={true}
                   {...register("productStock")}
+                  defaultValue={product.stock}
                 />
               </div>
             </div>
@@ -158,14 +189,20 @@ const AddProducts = () => {
               <FileInput
                 id="file"
                 helperText="Dimension should be less than 400px"
-                required={true}
                 {...register("productImage")}
               />
             </div>
             <div className="py-3">{loading && <Spinner></Spinner>}</div>
-            <Button className="mr-auto w-32 mt-3" type="submit">
-              Add
-            </Button>
+            <div className="flex gap-3">
+              <Button className="w-32 mt-3" type="submit">
+                Edit
+              </Button>
+              <Link to="/">
+                <Button color="failure" className="w-32 mt-3" type="submit">
+                  Cancel
+                </Button>
+              </Link>
+            </div>
           </form>
           <Toaster />
         </div>
@@ -174,4 +211,4 @@ const AddProducts = () => {
   );
 };
 
-export default AddProducts;
+export default EditProduct;

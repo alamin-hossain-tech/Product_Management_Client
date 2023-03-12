@@ -1,34 +1,31 @@
-import { Stack } from "@mui/material";
 import {
   Breadcrumb,
   Button,
-  Pagination,
+  Modal,
   Spinner,
   Table,
   TextInput,
 } from "flowbite-react";
 import React, { useState } from "react";
-import {
-  BsChevronRight,
-  BsHouse,
-  BsHouseDoor,
-  BsPlus,
-  BsSearch,
-} from "react-icons/bs";
+import { toast, Toaster } from "react-hot-toast";
+import { BsHouseDoor, BsPlus, BsSearch } from "react-icons/bs";
+import { HiOutlineExclamationCircle } from "react-icons/hi";
 import { useQuery } from "react-query";
 import { Link } from "react-router-dom";
 
 const Products = () => {
   const [page, setPage] = useState(0);
-  const [products, setProducts] = useState([]);
   const [search, setSearch] = useState("");
+  const [deleteId, setDeleteId] = useState(null);
 
-  const { refetch, isLoading } = useQuery({
+  const [openConfirmModal, setOpenConfirmModal] = useState(false);
+
+  const { data, refetch, isLoading } = useQuery({
     queryKey: [search, page],
     queryFn: () =>
       fetch(
         `http://localhost:5000/products?page=${page}&search=${search}`
-      ).then((res) => res.json().then((data) => setProducts(data))),
+      ).then((res) => res.json()),
   });
   const handleSerch = (e) => {
     e.preventDefault();
@@ -39,10 +36,25 @@ const Products = () => {
     setTimeout(() => {
       const searchvalue = document.getElementById("search");
       searchvalue.value = search;
-    }, 100);
+    }, 300);
   };
 
-  const pages = Math.ceil(products?.count / 5);
+  const handleDelete = (id) => {
+    fetch(`http://localhost:5000/delete/${id}`, {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.acknowledged === true) {
+          setOpenConfirmModal(false);
+          toast.success("Deleted Succesfully");
+          refetch();
+        }
+      });
+  };
+
+  const pages = Math.ceil(data?.count / 5);
 
   if (isLoading) {
     return (
@@ -63,9 +75,11 @@ const Products = () => {
           <Breadcrumb.Item>Products</Breadcrumb.Item>
         </Breadcrumb>
         <div className="flex justify-between pt-8">
-          <Button>
-            <BsPlus></BsPlus>Add Product
-          </Button>
+          <Link to="/add-products">
+            <Button>
+              <BsPlus></BsPlus>Add Product
+            </Button>
+          </Link>
           <form onSubmit={handleSerch}>
             <div className="flex gap-2">
               <TextInput
@@ -117,7 +131,7 @@ const Products = () => {
               </Table.Head>
               <Table.Body className="divide-y">
                 {!isLoading &&
-                  products?.products?.map((product) => (
+                  data?.products?.map((product) => (
                     <Table.Row
                       key={product._id}
                       className="bg-white dark:border-gray-700 dark:bg-gray-800"
@@ -130,28 +144,61 @@ const Products = () => {
                       <Table.Cell>{product.category}</Table.Cell>
                       <Table.Cell>{product.price + "$"}</Table.Cell>
                       <Table.Cell>
-                        <a
-                          href="/tables"
+                        <Link
+                          to={`/product/view/${product._id}`}
                           className="font-medium text-blue-600 hover:underline dark:text-blue-500"
                         >
                           View
-                        </a>
+                        </Link>
                       </Table.Cell>
                       <Table.Cell>
-                        <a
-                          href="/tables"
+                        <Link
+                          to={`/edit/${product._id}`}
                           className="font-medium text-blue-600 hover:underline dark:text-blue-500"
                         >
                           Edit
-                        </a>
+                        </Link>
                       </Table.Cell>
                       <Table.Cell>
-                        <a
-                          href="/tables"
+                        <Link
+                          onClick={() => {
+                            setOpenConfirmModal(true);
+                            setDeleteId(product._id);
+                          }}
                           className="font-medium text-blue-600 hover:underline dark:text-blue-500"
                         >
                           Delete
-                        </a>
+                        </Link>
+                        <Modal
+                          show={openConfirmModal}
+                          size="md"
+                          popup={true}
+                          onClose={() => setOpenConfirmModal(false)}
+                        >
+                          <Modal.Header />
+                          <Modal.Body>
+                            <div className="text-center">
+                              <HiOutlineExclamationCircle className="mx-auto mb-4 h-14 w-14 text-gray-400 dark:text-gray-200" />
+                              <h3 className="mb-5 text-lg font-normal text-gray-500 dark:text-gray-400">
+                                Are you sure you want to delete this product?
+                              </h3>
+                              <div className="flex justify-center gap-4">
+                                <Button
+                                  color="failure"
+                                  onClick={() => handleDelete(deleteId)}
+                                >
+                                  Yes, I'm sure
+                                </Button>
+                                <Button
+                                  color="gray"
+                                  onClick={() => setOpenConfirmModal(false)}
+                                >
+                                  No, cancel
+                                </Button>
+                              </div>
+                            </div>
+                          </Modal.Body>
+                        </Modal>
                       </Table.Cell>
                     </Table.Row>
                   ))}
@@ -171,15 +218,15 @@ const Products = () => {
                   <span className="sr-only">Previous</span>
                   <svg
                     aria-hidden="true"
-                    class="w-5 h-5"
+                    className="w-5 h-5"
                     fill="currentColor"
                     viewBox="0 0 20 20"
                     xmlns="http://www.w3.org/2000/svg"
                   >
                     <path
-                      fill-rule="evenodd"
+                      fillRule="evenodd"
                       d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z"
-                      clip-rule="evenodd"
+                      clipRule="evenodd"
                     ></path>
                   </svg>
                 </Link>
@@ -206,21 +253,22 @@ const Products = () => {
                   <span className="sr-only">Next</span>
                   <svg
                     aria-hidden="true"
-                    class="w-5 h-5"
+                    className="w-5 h-5"
                     fill="currentColor"
                     viewBox="0 0 20 20"
                     xmlns="http://www.w3.org/2000/svg"
                   >
                     <path
-                      fill-rule="evenodd"
+                      fillRule="evenodd"
                       d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
-                      clip-rule="evenodd"
+                      clipRule="evenodd"
                     ></path>
                   </svg>
                 </Link>
               </li>
             </ul>
           </nav>
+          <Toaster />
         </div>
       </div>
     </div>

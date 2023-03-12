@@ -2,8 +2,8 @@ import React from "react";
 
 const Trash = () => {
   return (
-    <div>
-      <h2>Trash</h2>
+    <div className="flex h-[500px] justify-center items-center">
+      <h2>Not Completed yet</h2>
     </div>
   );
 };
