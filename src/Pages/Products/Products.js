@@ -74,7 +74,7 @@ const Products = () => {
           </Breadcrumb.Item>
           <Breadcrumb.Item>Products</Breadcrumb.Item>
         </Breadcrumb>
-        <div className="flex justify-between pt-8">
+        <div className="flex gap-3 md:gap-0 items-center justify-between pt-8">
           <Link to="/add-products">
             <Button>
               <BsPlus></BsPlus>Add Product

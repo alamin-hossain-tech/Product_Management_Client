@@ -17,7 +17,7 @@ const Main = () => {
       <div className="flex flex-col md:flex-row">
         <div className="nav md:w-72 md:h-screen border-r">
           <Link to="/">
-            <h1 className="text-center text-xl font-semibold border-b flex items-center  h-20 text-blue-600">
+            <h1 className="text-center justify-center text-xl font-semibold border-b flex items-center  h-20 text-blue-600">
               Product Management System
             </h1>
           </Link>
@@ -49,7 +49,7 @@ const Main = () => {
           </div>
         </div>
         <div className="w-full">
-          <div className=" px-32 flex justify-end gap-4 items-center h-20  border-b-2">
+          <div className=" pr-4 md:px-32 flex justify-end gap-4 items-center h-20  border-b-2">
             <BsSearch></BsSearch>{" "}
             <p> Welcome, {localStorage.getItem("userName")}</p>{" "}
             <Button onClick={() => setModalOpen(true)}>Logout</Button>

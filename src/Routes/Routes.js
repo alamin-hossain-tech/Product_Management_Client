@@ -5,6 +5,7 @@ import EditProduct from "../Pages/EditProduct/EditProduct";
 import Error from "../Pages/Error/Error";
 import Login from "../Pages/Login/Login";
 import Products from "../Pages/Products/Products";
+import SignUp from "../Pages/SignUp/SignUp";
 import Trash from "../Pages/Trash/Trash";
 import ViewProduct from "../Pages/ViewProduct/ViewProduct";
 import PrivateRoutes from "../PrivateRoutes/PrivateRoutes";
@@ -59,6 +60,10 @@ export const routes = createBrowserRouter([
   {
     path: "/login",
     element: <Login></Login>,
+  },
+  {
+    path: "/signup",
+    element: <SignUp></SignUp>,
   },
   {
     path: "*",

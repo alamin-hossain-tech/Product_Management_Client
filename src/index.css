@@ -8,6 +8,9 @@
   --white: #ffffff;
 }
 
+* {
+  box-sizing: border-box;
+}
 ul li .active {
   position: relative;
   background-color: var(--lightBlue);
