@@ -22,3 +22,7 @@ ul li .active::before {
   /* border-radius: 0px 5px 5px 0px; */
   left: 0px;
 }
+
+.selected {
+  background: var(--lightBlue);
+}
