@@ -5,7 +5,7 @@ import {
   Table,
   TextInput,
 } from "flowbite-react";
-import React from "react";
+import React, { useState } from "react";
 import {
   BsChevronRight,
   BsHouse,
@@ -13,11 +13,21 @@ import {
   BsPlus,
   BsSearch,
 } from "react-icons/bs";
+import { useQuery } from "react-query";
 import { Link } from "react-router-dom";
 
 const Products = () => {
+  const [page, setPage] = useState(0);
+  const { data = [], refetch } = useQuery({
+    queryKey: ["products"],
+    queryFn: () =>
+      fetch(`http://localhost:5000/products?page=${page}`).then((res) =>
+        res.json()
+      ),
+  });
   const onPageChange = (e) => {
-    console.log(e);
+    setPage(e - 1);
+    refetch();
   };
   return (
     <div className="bg-gray-200 h-[91.4vh]">
@@ -64,43 +74,44 @@ const Products = () => {
               </Table.HeadCell>
             </Table.Head>
             <Table.Body className="divide-y">
-              <Table.Row className="bg-white dark:border-gray-700 dark:bg-gray-800">
-                <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-white flex gap-1 items-center">
-                  <img
-                    src="https://i.ibb.co/xDPRLRt/hero-image-resized.png"
-                    alt=""
-                    className="w-16"
-                  />{" "}
-                  Apple MacBook Pro 17"
-                </Table.Cell>
-                <Table.Cell>Sliver</Table.Cell>
-                <Table.Cell>Laptop</Table.Cell>
-                <Table.Cell>$2999</Table.Cell>
-                <Table.Cell>
-                  <a
-                    href="/tables"
-                    className="font-medium text-blue-600 hover:underline dark:text-blue-500"
-                  >
-                    View
-                  </a>
-                </Table.Cell>
-                <Table.Cell>
-                  <a
-                    href="/tables"
-                    className="font-medium text-blue-600 hover:underline dark:text-blue-500"
-                  >
-                    Edit
-                  </a>
-                </Table.Cell>
-                <Table.Cell>
-                  <a
-                    href="/tables"
-                    className="font-medium text-blue-600 hover:underline dark:text-blue-500"
-                  >
-                    Delete
-                  </a>
-                </Table.Cell>
-              </Table.Row>
+              {data.map((product) => (
+                <Table.Row
+                  key={product._id}
+                  className="bg-white dark:border-gray-700 dark:bg-gray-800"
+                >
+                  <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-white flex gap-1 items-center">
+                    <img src={product.img} alt="" className="w-16" />
+                    {product.name}
+                  </Table.Cell>
+                  <Table.Cell>{product.stock}</Table.Cell>
+                  <Table.Cell>{product.category}</Table.Cell>
+                  <Table.Cell>{product.price + "$"}</Table.Cell>
+                  <Table.Cell>
+                    <a
+                      href="/tables"
+                      className="font-medium text-blue-600 hover:underline dark:text-blue-500"
+                    >
+                      View
+                    </a>
+                  </Table.Cell>
+                  <Table.Cell>
+                    <a
+                      href="/tables"
+                      className="font-medium text-blue-600 hover:underline dark:text-blue-500"
+                    >
+                      Edit
+                    </a>
+                  </Table.Cell>
+                  <Table.Cell>
+                    <a
+                      href="/tables"
+                      className="font-medium text-blue-600 hover:underline dark:text-blue-500"
+                    >
+                      Delete
+                    </a>
+                  </Table.Cell>
+                </Table.Row>
+              ))}
             </Table.Body>
           </Table>
         </div>
@@ -109,7 +120,7 @@ const Products = () => {
             currentPage={1}
             onPageChange={onPageChange}
             showIcons={true}
-            totalPages={100}
+            totalPages={data.length}
           />
         </div>
       </div>
