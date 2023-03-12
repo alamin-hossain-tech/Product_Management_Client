@@ -205,6 +205,11 @@ const Products = () => {
               </Table.Body>
             </Table>
           )}
+          {data.products.length === 0 && (
+            <div className="bg-white dark:border-gray-700 dark:bg-gray-800 text-center py-3 my-2 rounded-lg shadow-lg">
+              <h2 className="font-semibold text-xl">Sorry! No Prodcut Found</h2>
+            </div>
+          )}
         </div>
 
         <div className="text-center pt-5">
